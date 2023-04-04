@@ -2,6 +2,13 @@
 @{
     ViewData["Title"] = "Login";
 }
+
+@{
+    if(ViewBag.Error != null)
+    {
+        <div>@ViewBag.Error</div> 
+    }
+}
 <div class="container">
     <div class="row">
         <div class="col-lg-4 col-md-3"></div>
@@ -9,7 +16,7 @@
             <form method="post" asp-controller="Login" asp-action="Login">
                 <div class="mb-3">
                     <label for="email" class="col-form-label">E-Mail Address:</label>
-                    <input asp-for="UserEmail" type="email" class="form-control text-center" id="email">
+                    <input asp-for="UserEmail" type="text" class="form-control text-center" id="email">
                 </div>
                 <div class="mb-3">
                     <label for="password" class="col-form-label">Password:</label>
