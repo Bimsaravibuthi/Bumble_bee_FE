@@ -1,0 +1,154 @@
+﻿<h2>User List</h2>
+<button style="float:right;" type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addUserModal">
+    Add User
+</button>
+<br />
+<br />
+<br />
+<table id="tblUser" class="table table-dark table-hover">
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>NIC</th>
+            <th>FIRST NAME</th>
+            <th>LAST NAME</th>
+            <th>E-MAIL</th>
+            <th>ACTION</th>
+        </tr>
+    </thead>
+    <tbody></tbody>
+</table>
+
+<!-- Modal -->
+<div class="modal fade" id="addUserModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="addUserModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form id="addUserForm">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="addUserModalLabel">Add User</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">               
+                    <div class="mb-3">
+                        <label for="nic" class="col-form-label">NIC Number :</label>
+                        <input type="text" class="form-control text-center" id="nic">
+                    </div>
+                    <div class="mb-3">
+                        <label for="email" class="col-form-label">E-Mail Address :</label>
+                        <input type="email" class="form-control text-center" id="email">
+                    </div>
+                    <div class="row">
+                        <div class="col">
+                            <div class="mb-3">
+                                <label for="fname" class="col-form-label">First Name :</label>
+                                <input type="text" class="form-control text-center" id="fname">
+                            </div>                           
+                        </div>
+                        <div class="col">
+                            <div class="mb-3">
+                                <label for="lname" class="col-form-label">Last Name :</label>
+                                <input type="text" class="form-control text-center" id="lname">
+                            </div>
+                        </div>
+                    </div>                 
+                    <div class="row">
+                        <div class="col">
+                            <div class="mb-3">
+                                <label for="password" class="col-form-label">Password :</label>
+                                <input type="password" class="form-control text-center" id="password">
+                            </div>
+                        </div>
+                        <div class="col">
+                            <div class="mb-3">
+                                <label for="re-password" class="col-form-label">Confirm Password :</label>
+                                <input type="password" class="form-control text-center" id="re-password">
+                            </div>
+                        </div>
+                    </div>                
+                </div>
+                <div class="modal-footer">
+                    <button type="reset" class="btn btn-secondary">Clear</button>
+                    <button type="button" onClick="AddUser()" class="btn btn-primary">Save</button>
+                </div>
+            </form>           
+        </div>
+    </div>
+</div>
+
+<script type="text/javascript">
+    window.onload = function () {
+        GetAllUsers();
+    };
+
+    function AddUser() {
+        var nic = document.getElementById("nic").value;
+        var email = document.getElementById("email").value;
+        var fname = document.getElementById("fname").value;
+        var lname = document.getElementById("lname").value;
+        var password = document.getElementById("password").value;
+
+        var userData = {
+            USR_NIC: nic,
+            USR_FNAME: fname,
+            USR_LNAME: lname,
+            USR_EMAIL: email,
+            USR_PWD: password,
+            USR_TYPE: "AD"
+        }
+        $.ajax({
+            type: "POST",
+            url: "@Url.Action("AddUser")",
+            data: userData,
+            success: function (data) {
+                data = JSON.parse(data);
+                alert(data.STATUS_MSG);
+                GetAllUsers();
+            },
+            failure: function (err) {
+                console.error(err);
+            }
+        });
+    }
+
+    function GetAllUsers(){
+
+        var userData = [];
+        var bucket;
+        var tbody = document.getElementsByTagName("tbody")[0];
+        tbody.innerHTML = "";
+
+        $.ajax({
+            type:"POST",
+            url: "@Url.Action("GetAllUsers")",
+            data: {userType:"AD"},
+            dataType: "json",
+            success: function(data){
+
+                bucket = JSON.parse(data);
+                for (i = 0; i < bucket.length; i++) 
+                {
+                    userData.push([bucket[i].USR_ID, bucket[i].USR_NIC, bucket[i].USR_FNAME, bucket[i].USR_LNAME, bucket[i].USR_EMAIL, bucket.USR_STATUS])
+                }
+                
+                for (var i = 0; i < userData.length; i++)
+                {
+                    var row = document.createElement("tr");
+                    var item = userData[i];
+
+                    for(var prop in item)
+                    {
+                        var cell = document.createElement("td");
+                        cell.textContent = item[prop];
+                        row.appendChild(cell);
+                    }
+                    tbody.appendChild(row);
+                }
+                
+            },
+            failure: function(err){
+
+            }
+        });
+        
+    }
+</script>
